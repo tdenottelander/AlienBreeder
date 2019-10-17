@@ -1,0 +1,85 @@
+class Genotype {
+
+    constructor (){
+        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing"];
+        this.realGenotype = new Map()
+        for (let s of this.properties){
+            this.realGenotype.set(s, Math.random())
+        }
+        
+        this.discreteGenotypeLibrary = new Map()
+        this.discreteGenotypeLibrary.set("mouth", 5)
+        this.discreteGenotypeLibrary.set("armCount", 2)
+        this.discreteGenotype = new Map()
+        for (let entry of this.discreteGenotypeLibrary.keys()){
+            this.discreteGenotype.set(entry, Math.floor(Math.random() * this.discreteGenotypeLibrary.get(entry)))
+        }
+    }
+
+    clone(){
+        let gen = new Genotype()
+        for(let entry of this.realGenotype){
+            gen.realGenotype.set(entry[0], entry[1])
+        }
+        for(let entry of this.discreteGenotype){
+            gen.discreteGenotype.set(entry[0], entry[1])
+        }
+        return gen
+    }
+
+    mutate(){
+        for (let entry of this.realGenotype.keys()){
+            if(Math.random() > 0.5){
+                let value = this.realGenotype.get(entry) + (Math.random() * 0.3 - 0.15)
+                this.realGenotype.set(entry, Math.max(Math.min(value, 1), 0))
+            }
+        }
+
+        for (let entry of this.discreteGenotype.keys()){
+            if(Math.random() > 0.90){
+                let value = this.discreteGenotype.get(entry)
+                let newValue = value
+                while(newValue == value){
+                    newValue = Math.floor(Math.random() * this.discreteGenotypeLibrary.get(entry))
+                }
+                this.discreteGenotype.set(entry, newValue)
+            }
+        }
+        return this
+    }
+
+    crossover(other){
+        for (let entry of this.realGenotype.keys()){
+            if(Math.random() > 0.5){
+                let thisValue = this.realGenotype.get(entry)
+                let otherValue = other.realGenotype.get(entry)
+                this.realGenotype.set(entry, otherValue)
+                other.realGenotype.set(entry, thisValue)
+            }
+        }
+
+        for (let entry of this.discreteGenotype.keys()){
+            if(Math.random() > 0.5){
+                let thisValue = this.discreteGenotype.get(entry)
+                let otherValue = other.discreteGenotype.get(entry)
+                this.discreteGenotype.set(entry, otherValue)
+                other.discreteGenotype.set(entry, thisValue)
+            }
+        }
+    }
+
+    get(property){
+        let res = 0;
+        if(this.realGenotype.has(property)){
+            return this.realGenotype.get(property)
+        } else if (this.discreteGenotype.has(property)){
+            return this.discreteGenotype.get(property)
+        } else {
+            throw console.error("There is no such property as [" + property + "]");
+        }
+    }
+
+    toString(){
+        return this.realGenotype
+    }
+}
