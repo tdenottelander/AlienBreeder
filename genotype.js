@@ -9,7 +9,8 @@ class Genotype {
         
         this.discreteGenotypeLibrary = new Map()
         this.discreteGenotypeLibrary.set("mouth", 5)
-        this.discreteGenotypeLibrary.set("armCount", 2)
+        this.discreteGenotypeLibrary.set("armCount", 3)
+        this.discreteGenotypeLibrary.set("eyeType", 3)
         this.discreteGenotype = new Map()
         for (let entry of this.discreteGenotypeLibrary.keys()){
             this.discreteGenotype.set(entry, Math.floor(Math.random() * this.discreteGenotypeLibrary.get(entry)))
@@ -30,7 +31,7 @@ class Genotype {
     mutate(){
         for (let entry of this.realGenotype.keys()){
             if(Math.random() > 0.5){
-                let value = this.realGenotype.get(entry) + (Math.random() * 0.3 - 0.15)
+                let value = this.realGenotype.get(entry) + (Math.random() * slider.value() - 0.5 * slider.value())
                 this.realGenotype.set(entry, Math.max(Math.min(value, 1), 0))
             }
         }

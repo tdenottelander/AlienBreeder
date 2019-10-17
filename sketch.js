@@ -5,6 +5,7 @@ function setup(){
     var width = 600;
     var height = 600;
     canvas = createCanvas(width, height);
+    slider = createSlider(0, 0.5, 0.2, 0.01)
 }
 
 function draw(){

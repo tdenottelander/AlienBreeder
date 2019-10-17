@@ -22,9 +22,21 @@ class EA {
         }
     }
 
-    crossover(){
-        for(let id = 0; id < this.population.length; id+=2){
-            ea.population[id].crossover(ea.population[id+1])
+    crossover(type){
+        if(type == "paired"){
+            for(let id = 0; id < this.population.length; id+=2){
+                ea.population[id].crossover(ea.population[id+1])
+            }
+        } else {
+            let idx = [this.popSize]
+            for(let i = 0; i < this.popSize; i++){
+                idx[i] = i
+            }
+            idx = shuffle(idx)
+        
+            for(let id = 0; id < this.popSize; id+=2){
+                ea.population[idx[id]].crossover(ea.population[idx[id+1]])
+            }
         }
     }
 
