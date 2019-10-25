@@ -1,6 +1,8 @@
 var ea = new EA();
 console.log(ea.toString())
 
+var hoverID = -1
+
 function setup(){
     var width = 600;
     var height = 600;
@@ -10,7 +12,10 @@ function setup(){
 
 function draw(){
     background(255)
-    drawSelectionBox()
+    if(mouseInBounds()){
+        drawSelectionBox()
+        wiggleAliens()
+    }
 
     for (let i = 0; i < ea.population.length; i++){
         let ind = ea.population[i]
@@ -19,12 +24,23 @@ function draw(){
 }
 
 function drawSelectionBox(){
-    if(mouseInBounds()){
-        noStroke()
-        fill(240)
-        rectX = 100 * int(mouseX / 100)
-        rectY = 100 * int(mouseY / 100)
-        rect(rectX, rectY, 100, 100)
+    noStroke()
+    fill(240)
+    rectX = 100 * int(mouseX / 100)
+    rectY = 100 * int(mouseY / 100)
+    rect(rectX, rectY, 100, 100)
+}
+
+function wiggleAliens(){
+    xID = int(mouseX / 100)
+    yID = int(mouseY / 100)
+    ID = yID * 6 + xID
+    if(hoverID != ID){
+        if(hoverID != -1){
+            ea.population[hoverID].wiggle = false
+        }
+        hoverID = ID
+        ea.population[ID].wiggle = true
     }
 }
 

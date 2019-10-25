@@ -1,5 +1,11 @@
 class Individual{
 
+    wiggle = false
+    wiggleFactor = 2
+    counter = 0
+    counterIncrease = Math.PI / 20;
+    wiggleOffset = 0
+
     constructor(id){
         this.id = id
         this.genotype = new Genotype()
@@ -27,6 +33,12 @@ class Individual{
     draw(){
         let x = (this.id % 6) * 100 + 50
         let y = int(this.id / 6) * 100 + 50
+        if(this.wiggle){
+            this.counter += this.counterIncrease
+            this.counter = this.counter % (2 * Math.PI)
+            this.wiggleOffset = this.wiggleFactor * Math.sin(this.counter + Math.PI/2)
+            y += this.wiggleOffset
+        }
 
         this.rgb = [this.get("colorRed") * 255, this.get("colorBlue") * 255, this.get("colorGreen") * 255]
 
