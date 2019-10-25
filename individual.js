@@ -68,6 +68,9 @@ class Individual{
         let eyeY = y + this.get("eyeYPos") * 10 - 5
         let eyeSize = 0.001 * headSize + this.get("eyeSize") * 10 + 5
         let pupilSize = this.get("eyeSize") * 5 + 2.5
+        let pupilLX = eyeLX + this.getPupilOffset(eyeLX, 'x', pupilSize)
+        let pupilRX = eyeRX + this.getPupilOffset(eyeRX, 'x', pupilSize)
+        let pupilY = eyeY + this.getPupilOffset(eyeY, 'y', pupilSize)
 
         let eyeType = this.get("eyeType")
         if(eyeType == 0){
@@ -78,8 +81,8 @@ class Individual{
             circle(eyeLX, eyeY, eyeSize)
             circle(eyeRX, eyeY, eyeSize)
             fill(0)
-            circle(eyeLX, eyeY, pupilSize)
-            circle(eyeRX, eyeY, pupilSize)
+            circle(pupilLX, pupilY, pupilSize)
+            circle(pupilRX, pupilY, pupilSize)
         } else if (eyeType == 1) {
             fill(this.rgb)
             rect(eyeLX - 0.6 * eyeSize, eyeY - 0.6 * eyeSize, 1.2 * eyeSize, 1.2 * eyeSize)
@@ -88,14 +91,26 @@ class Individual{
             rect(eyeLX - 0.5 * eyeSize, eyeY - 0.5 * eyeSize, eyeSize, eyeSize)
             rect(eyeRX - 0.5 * eyeSize, eyeY - 0.5 * eyeSize, eyeSize, eyeSize)
             fill(0)
-            rect(eyeLX - 0.5 * pupilSize, eyeY - 0.5 * pupilSize, pupilSize, pupilSize)
-            rect(eyeRX - 0.5 * pupilSize, eyeY - 0.5 * pupilSize, pupilSize, pupilSize)
+            rect(pupilLX - 0.5 * pupilSize, pupilY - 0.5 * pupilSize, pupilSize, pupilSize)
+            rect(pupilRX - 0.5 * pupilSize, pupilY - 0.5 * pupilSize, pupilSize, pupilSize)
         } else if (eyeType == 2) {
             fill(0)
             circle(eyeLX, eyeY, eyeSize * 1.2)
             circle(eyeRX, eyeY, eyeSize * 1.2)
         }
         
+    }
+
+    getPupilOffset(position, type, pupilSize){
+        let offset = 0
+        if(type == 'x'){
+            offset = mouseX - position
+        } else if(type == 'y'){
+            offset = mouseY - position
+        }
+        offset = offset * 0.0025 * pupilSize
+        return Math.max(Math.min(offset, pupilSize * 0.2), -pupilSize * 0.2)
+        return offset
     }
 
     drawArms(x, y, bodySize){
