@@ -124,16 +124,6 @@
             background-color: black;
             /* border: solid black 2px ; */
         }
-
-        #savewindow {
-            background-color: red;
-            width: 80%;
-            height: 20%;
-            position: fixed;
-            left: 10%;
-            top: 20%;
-            display: none;
-        }
     </style>
 </head>
 
@@ -194,4 +184,6 @@
     <button onclick="createNewPopulation()" id="newpopulation">Create new population</button>
     <button onclick="mutate()">Mutate</button>
     <button onclick="crossover()">Crossover</button>
+    <button id="savebutton" onclick="saveAlien()">Save as image</button>
+    <p id="slidertext">Mutation amount: </p>
 </body>

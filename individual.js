@@ -31,7 +31,7 @@ class Individual{
         return this.genotype.get(property)
     }
 
-    draw(){
+    draw(save = false){
         let x = (this.id % 6) * 100 + 50
         let y = int(this.id / 6) * 100 + 50
         if(this.wiggle){
@@ -58,12 +58,12 @@ class Individual{
         this.drawMouth(x, y, this.get("mouth"))
 
         // Draw eyes
-        this.drawEyes(x, y, headSize)
+        this.drawEyes(x, y, headSize, save)
 
         
     }
 
-    drawEyes(x, y, headSize){
+    drawEyes(x, y, headSize, save){
         noStroke()
         let eyePositioning = 0.025 * headSize * this.get("eyePositioning") * 10 + 5
         let eyeLX = x - eyePositioning
@@ -71,9 +71,9 @@ class Individual{
         let eyeY = y + this.get("eyeYPos") * 10 - 5
         let eyeSize = 0.001 * headSize + this.get("eyeSize") * 10 + 5
         let pupilSize = this.get("eyeSize") * 5 + 2.5
-        let pupilLX = eyeLX + this.getPupilOffset(eyeLX, 'x', pupilSize)
-        let pupilRX = eyeRX + this.getPupilOffset(eyeRX, 'x', pupilSize)
-        let pupilY = eyeY + this.getPupilOffset(eyeY, 'y', pupilSize)
+        let pupilLX = save ? eyeLX : eyeLX + this.getPupilOffset(eyeLX, 'x', pupilSize)
+        let pupilRX = save ? eyeRX : eyeRX + this.getPupilOffset(eyeRX, 'x', pupilSize)
+        let pupilY = save ? eyeY : eyeY + this.getPupilOffset(eyeY, 'y', pupilSize)
 
         let eyeType = this.get("eyeType")
         if(eyeType == 0){

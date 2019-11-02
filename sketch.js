@@ -1,5 +1,6 @@
 var ea = new EA();
 console.log(ea.toString())
+var saving = false;
 
 var hoverID = -1
 
@@ -20,7 +21,7 @@ function draw(){
 
     for (let i = 0; i < ea.population.length; i++){
         let ind = ea.population[i]
-        ind.draw(i)
+        ind.draw()
     }
 }
 
@@ -30,6 +31,10 @@ function drawSelectionBox(){
     rectX = 100 * int(mouseX / 100)
     rectY = 100 * int(mouseY / 100)
     rect(rectX, rectY, 100, 100)
+    if(saving){
+        fill(255)
+        text('Save as PNG', rectX + 15, rectY + 90);
+    }
 }
 
 function wiggleAliens(){
@@ -68,7 +73,23 @@ function genotype(){
 function mousePressed(){
     if(mouseInBounds()){
         let i = int(mouseY / 100) * 6 + int(mouseX / 100)
-        ea.createNewPopulationFromIndividual(i)
+        if(!saving){
+            ea.createNewPopulationFromIndividual(i)
+        } else {
+            clear()
+            this.ea.population[i].draw(true)
+            rectX = 100 * int(mouseX / 100)
+            rectY = 100 * int(mouseY / 100)
+            let cropped = get(rectX, rectY, 100, 100)
+            save(cropped, "alien.png")
+        }
     }
+} 
+
+function saveAlien(){
+    let savebutton = document.getElementById("savebutton")
+    savebutton.textContent = saving ? "Save as image" : "cancel"
+    savebutton.style.backgroundColor = saving ? "#0071BC" : "red"
+    saving = !saving
 }
 
