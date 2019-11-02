@@ -3,12 +3,18 @@ var space;
 console.log(ea.toString())
 var saving = false;
 var slider;
-
 var hoverID = -1
 
+// Prevent selection of text on double click
+document.addEventListener('mousedown', function (event) {
+    if (event.detail > 1) {
+      event.preventDefault();
+    }
+  }, false);
+
 function setup(){
-    var width = 600;
-    var height = 600;
+    var width = this.ea.population.length / 5 * 100;
+    var height = this.ea.population.length / 6 * 100;
     canvas = createCanvas(width, height);
     canvas.parent('CanvasHolder')
     slider = createSlider(0, 0.5, 0.25, 0.125)
@@ -35,7 +41,6 @@ function slidertext (){
 }
 
 function draw(){
-    // background(20, 20, 20)
     clear()
     if(mouseInBounds()){
         drawSelectionBox()
@@ -48,7 +53,6 @@ function draw(){
     }
 
     space.draw()
-
 }
 
 function drawSelectionBox(){
@@ -72,6 +76,7 @@ function wiggleAliens(){
             ea.population[hoverID].wiggle = false
         }
         hoverID = ID
+        ea.population[ID].counter = 0.5 * Math.PI
         ea.population[ID].wiggle = true
     }
 }
@@ -101,6 +106,7 @@ function mousePressed(){
         let i = int(mouseY / 100) * 6 + int(mouseX / 100)
         if(!saving){
             ea.createNewPopulationFromIndividual(i)
+            hoverID = -1
         } else {
             clear()
             this.ea.population[i].draw(true)
@@ -108,6 +114,7 @@ function mousePressed(){
             rectY = 100 * int(mouseY / 100)
             let cropped = get(rectX, rectY, 100, 100)
             save(cropped, "alien.png")
+            saveAlien()
         }
     }
 } 

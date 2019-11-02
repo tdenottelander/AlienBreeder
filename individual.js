@@ -37,7 +37,7 @@ class Individual{
         if(this.wiggle){
             this.counter += this.counterIncrease
             this.counter = this.counter % (2 * Math.PI)
-            this.wiggleOffset = this.wiggleFactor * Math.sin(this.counter + Math.PI/2)
+            this.wiggleOffset = this.wiggleFactor * (8 - 7 * this.get("headSize")) * Math.sin(this.counter + Math.PI/2)
             y += this.wiggleOffset
         }
 
