@@ -1,4 +1,5 @@
 var ea = new EA();
+var space;
 console.log(ea.toString())
 var saving = false;
 var slider;
@@ -13,6 +14,8 @@ function setup(){
     slider = createSlider(0, 0.5, 0.25, 0.125)
     slider.input(slidertext)
     slider.parent(document.getElementById("slider"))
+    let pg = createGraphics(windowWidth, windowHeight)
+    space = new Space(pg);
 }
 
 function slidertext (){
@@ -32,7 +35,8 @@ function slidertext (){
 }
 
 function draw(){
-    background(20, 20, 20)
+    // background(20, 20, 20)
+    clear()
     if(mouseInBounds()){
         drawSelectionBox()
         wiggleAliens()
@@ -42,11 +46,14 @@ function draw(){
         let ind = ea.population[i]
         ind.draw()
     }
+
+    space.draw()
+
 }
 
 function drawSelectionBox(){
     noStroke()
-    fill(40,40,40)
+    fill(60,60,60,100)
     rectX = 100 * int(mouseX / 100)
     rectY = 100 * int(mouseY / 100)
     rect(rectX, rectY, 100, 100)
