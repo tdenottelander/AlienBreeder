@@ -24,16 +24,27 @@
             margin: 1em;
             border-radius: 0.5em;
             font-size: 1em;
+            cursor:pointer
         }
+        button:hover{
+            background-color: rgb(47, 141, 204);
+        }
+
         #newpopulation {
             background-color: #22B573;
         }
+
+        #newpopulation:hover {
+            background-color: rgb(58, 212, 143);
+        }
+
         input {
             color: red !important;
         }
         input[type=range] {
             -webkit-appearance: none;
-            width: 100%;
+            width: 600px;
+            max-width: 100%;
             margin: -2.1px 0;
         }
         input[type=range]:focus {
@@ -58,6 +69,9 @@
             cursor: pointer;
             -webkit-appearance: none;
             margin-top: 2.1px;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            background: rgba(13, 130, 207, 0.97);
         }
         input[type=range]:focus::-webkit-slider-runnable-track {
             background: #282828;
@@ -118,7 +132,10 @@
 
         canvas {
             background-color: black;
-            /* border: solid black 2px ; */
+        }
+
+        canvas:hover{
+            cursor: pointer;
         }
 
         span > p{
@@ -190,4 +207,5 @@
         <p>Mutation amount: </p>
         <p id="slidertext"> Average</p>
     </span>
+    <div id="slider"></div>
 </body>

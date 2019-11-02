@@ -12,6 +12,7 @@ function setup(){
     canvas.parent('CanvasHolder')
     slider = createSlider(0, 0.5, 0.25, 0.125)
     slider.input(slidertext)
+    slider.parent(document.getElementById("slider"))
 }
 
 function slidertext (){
