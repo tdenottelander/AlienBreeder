@@ -1,6 +1,7 @@
 var ea = new EA();
 console.log(ea.toString())
 var saving = false;
+var slider;
 
 var hoverID = -1
 
@@ -9,7 +10,24 @@ function setup(){
     var height = 600;
     canvas = createCanvas(width, height);
     canvas.parent('CanvasHolder')
-    slider = createSlider(0, 0.5, 0.2, 0.01)
+    slider = createSlider(0, 0.5, 0.25, 0.125)
+    slider.input(slidertext)
+}
+
+function slidertext (){
+    let slidertext = document.getElementById("slidertext")
+    let slidervalue = slider.value()
+    if(slidervalue == 0){
+        slidertext.textContent = "Delicate"
+    } else if (slidervalue == 0.125) {
+        slidertext.textContent = "Somewhat"
+    } else if (slidervalue == 0.25) {
+        slidertext.textContent = "Average"
+    } else if (slidervalue == 0.375) {
+        slidertext.textContent = "crazy"
+    } else if (slidervalue == 0.5) {
+        slidertext.textContent = "CRAZY"
+    }
 }
 
 function draw(){
