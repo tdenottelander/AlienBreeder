@@ -7,11 +7,12 @@ function setup(){
     var width = 600;
     var height = 600;
     canvas = createCanvas(width, height);
+    canvas.parent('CanvasHolder')
     slider = createSlider(0, 0.5, 0.2, 0.01)
 }
 
 function draw(){
-    background(255)
+    background(20, 20, 20)
     if(mouseInBounds()){
         drawSelectionBox()
         wiggleAliens()
@@ -25,7 +26,7 @@ function draw(){
 
 function drawSelectionBox(){
     noStroke()
-    fill(240)
+    fill(40,40,40)
     rectX = 100 * int(mouseX / 100)
     rectY = 100 * int(mouseY / 100)
     rect(rectX, rectY, 100, 100)

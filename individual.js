@@ -5,6 +5,7 @@ class Individual{
     counter = 0
     counterIncrease = Math.PI / 20;
     wiggleOffset = 0
+    colorOffset = 50
 
     constructor(id){
         this.id = id
@@ -40,7 +41,9 @@ class Individual{
             y += this.wiggleOffset
         }
 
-        this.rgb = [this.get("colorRed") * 255, this.get("colorBlue") * 255, this.get("colorGreen") * 255]
+        let interpolator = 255 - this.colorOffset
+
+        this.rgb = [this.getColor("Red"), this.getColor("Blue"), this.getColor("Green")]
 
         // Draw body
         fill(this.rgb)
@@ -160,7 +163,7 @@ class Individual{
             let headSize = this.get("headSize")
             let multiplier = 1 + headSize * 1.1;
             let offset = 5 + 10 * headSize
-            fill(this.get("colorRed") * 255, this.get("colorBlue") * 255, this.get("colorGreen") * 255)
+            fill(this.getColor("Red"), this.getColor("Blue"), this.getColor("Green"))
             stroke(0)
             beginShape()
             vertex(x - 2 * multiplier, y + offset + 0 * multiplier)
@@ -173,5 +176,9 @@ class Individual{
             vertex(x + 2 * multiplier, y + offset + 0 * multiplier)
             endShape()
         }
+    }
+
+    getColor(color){
+        return this.get("color"+color) * (255 - this.colorOffset) + this.colorOffset
     }
 }
