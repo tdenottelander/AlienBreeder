@@ -1,19 +1,37 @@
 class Genotype {
 
     constructor (){
-        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing"];
         this.realGenotype = new Map()
-        for (let s of this.properties){
-            this.realGenotype.set(s, Math.random())
-        }
-        
+        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing"];
+    
         this.discreteGenotypeLibrary = new Map()
         this.discreteGenotypeLibrary.set("mouth", 5)
         this.discreteGenotypeLibrary.set("armCount", 3)
         this.discreteGenotypeLibrary.set("eyeType", 3)
         this.discreteGenotype = new Map()
+
+        this.customInitialization()
+    }
+
+    randomInitialization(){
+        for (let s of this.properties){
+            this.realGenotype.set(s, Math.random())
+        }
         for (let entry of this.discreteGenotypeLibrary.keys()){
             this.discreteGenotype.set(entry, Math.floor(Math.random() * this.discreteGenotypeLibrary.get(entry)))
+        }
+    }
+
+    customInitialization(){
+        for (let s of this.properties){
+            this.realGenotype.set(s, 0)
+        }
+        this.realGenotype.set("colorRed", 0.5)
+        this.realGenotype.set("colorBlue", 0.5)
+        this.realGenotype.set("colorGreen", 0.5)
+
+        for (let entry of this.discreteGenotypeLibrary.keys()){
+            this.discreteGenotype.set(entry, 0)
         }
     }
 

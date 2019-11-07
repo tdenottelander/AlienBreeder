@@ -1,9 +1,10 @@
-var ea = new EA();
+var ea ;
 var space;
-console.log(ea.toString())
+// console.log(ea.toString())
 var saving = false;
 var slider;
 var hoverID = -1
+var width, height
 
 // Prevent selection of text on double click
 document.addEventListener('mousedown', function (event) {
@@ -13,8 +14,8 @@ document.addEventListener('mousedown', function (event) {
   }, false);
 
 function setup(){
-    var width = this.ea.population.length / 5 * 100;
-    var height = this.ea.population.length / 6 * 100;
+    width = 800;
+    height = 400;
     canvas = createCanvas(width, height);
     canvas.parent('CanvasHolder')
     slider = createSlider(0, 0.5, 0.25, 0.125)
@@ -22,6 +23,7 @@ function setup(){
     slider.parent(document.getElementById("slider"))
     let pg = createGraphics(windowWidth, windowHeight)
     space = new Space(pg);
+    ea = new EA();
 }
 
 function slidertext (){
@@ -43,8 +45,7 @@ function slidertext (){
 function draw(){
     clear()
     if(mouseInBounds()){
-        drawSelectionBox()
-        wiggleAliens()
+        highlightAliens()
     }
 
     for (let i = 0; i < ea.population.length; i++){
@@ -53,6 +54,26 @@ function draw(){
     }
 
     space.draw()
+}
+
+function highlightAliens(){
+    ID = -1
+    for (let id = 0; id < ea.population.length; id++){
+        if(Math.abs(mouseX - ea.population[id].body.pos.x) < 30 && Math.abs(mouseY - ea.population[id].body.pos.y) < 30){
+            ID = id
+        }
+    }
+
+    if(hoverID != ID){
+        if(hoverID != -1){
+            ea.population[hoverID].wiggle = false
+        }
+        hoverID = ID
+        if(ID != -1){
+            ea.population[ID].wiggle = true
+        }
+    }
+    // ea.population[ID].wiggle = true
 }
 
 function drawSelectionBox(){
@@ -70,14 +91,17 @@ function drawSelectionBox(){
 function wiggleAliens(){
     xID = int(mouseX / 100)
     yID = int(mouseY / 100)
-    ID = yID * 6 + xID
-    if(hoverID != ID){
-        if(hoverID != -1){
-            ea.population[hoverID].wiggle = false
+    newID = yID * 6 + xID
+    if(newID < ea.population.length){
+        ID = yID * 6 + xID
+        if(hoverID != ID){
+            if(hoverID != -1){
+                ea.population[hoverID].wiggle = false
+            }
+            hoverID = ID
+            ea.population[ID].counter = 0.5 * Math.PI
+            ea.population[ID].wiggle = true
         }
-        hoverID = ID
-        ea.population[ID].counter = 0.5 * Math.PI
-        ea.population[ID].wiggle = true
     }
 }
 
@@ -102,21 +126,25 @@ function genotype(){
 }
 
 function mousePressed(){
-    if(mouseInBounds()){
-        let i = int(mouseY / 100) * 6 + int(mouseX / 100)
-        if(!saving){
-            ea.createNewPopulationFromIndividual(i)
-            hoverID = -1
-        } else {
-            clear()
-            this.ea.population[i].draw(true)
-            rectX = 100 * int(mouseX / 100)
-            rectY = 100 * int(mouseY / 100)
-            let cropped = get(rectX, rectY, 100, 100)
-            save(cropped, "alien.png")
-            saveAlien()
-        }
+    if(mouseInBounds() && hoverID != -1){
+        ea.createNewPopulationFromIndividual(hoverID)
+        hoverID = -1
     }
+    // if(mouseInBounds()){
+    //     let i = int(mouseY / 100) * 6 + int(mouseX / 100)
+    //     if(!saving){
+    //         ea.createNewPopulationFromIndividual(i)
+    //         hoverID = -1
+    //     } else {
+    //         clear()
+    //         this.ea.population[i].draw(true)
+    //         rectX = 100 * int(mouseX / 100)
+    //         rectY = 100 * int(mouseY / 100)
+    //         let cropped = get(rectX, rectY, 100, 100)
+    //         save(cropped, "alien.png")
+    //         saveAlien()
+    //     }
+    // }
 } 
 
 function saveAlien(){

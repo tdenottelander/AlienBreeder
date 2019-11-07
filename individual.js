@@ -1,7 +1,7 @@
 class Individual{
 
     wiggle = false
-    wiggleFactor = 2
+    wiggleFactor = 0.2
     counter = 0
     counterIncrease = Math.PI / 20;
     wiggleOffset = 0
@@ -10,6 +10,7 @@ class Individual{
     constructor(id){
         this.id = id
         this.genotype = new Genotype()
+        this.body = new Body()
     }
 
     crossover(other){
@@ -32,43 +33,68 @@ class Individual{
     }
 
     draw(save = false){
-        let x = (this.id % 6) * 100 + 50
-        let y = int(this.id / 6) * 100 + 50
-        if(this.wiggle){
-            this.counter += this.counterIncrease
-            this.counter = this.counter % (2 * Math.PI)
-            this.wiggleOffset = this.wiggleFactor * (8 - 7 * this.get("headSize")) * Math.sin(this.counter + Math.PI/2)
-            y += this.wiggleOffset
-        }
+        this.body.update()
 
-        let interpolator = 255 - this.colorOffset
+        let offset = this.getWiggleOffset()
+        
+        translate(this.body.pos.x + offset.x, this.body.pos.y + offset.y)
+        rotate(this.body.direction.heading() + Math.PI * 0.5)
+
+        if(this.wiggle){
+            this.drawHighlight()
+        }
 
         this.rgb = [this.getColor("Red"), this.getColor("Blue"), this.getColor("Green")]
 
         // Draw body
         fill(this.rgb)
         noStroke()
-        let headSize = this.get("headSize") * 50 + 20
-        circle(x, y, headSize)
+        this.bodySize = (this.get("headSize") * 50 + 20)
+        // circle(0, 0, headSize)
+        this.drawBody()
+        this.drawTail()
 
         // Draw arms
-        this.drawArms(x, y, headSize)
+        this.drawArms()
 
         // Draw mouth
-        this.drawMouth(x, y, this.get("mouth"))
+        this.drawMouth()
 
         // Draw eyes
-        this.drawEyes(x, y, headSize, save)
+        this.drawEyes(save)
 
-        
+        resetMatrix();
     }
 
-    drawEyes(x, y, headSize, save){
+    getWiggleOffset(){
+        this.counter += this.counterIncrease
+        this.counter = this.counter % (2 * Math.PI)
+        this.wiggleOffset = this.wiggleFactor * 0.1 * (4 - 3 * this.get("headSize")) * Math.sin(this.counter + Math.PI/2)
+        let unitX = createVector(1,0)
+        let unitY = createVector(0,1)
+        let rotatedDir = createVector(this.body.direction.x, this.body.direction.y).rotate(0.5 * Math.PI)
+        let x = this.wiggleOffset * p5.Vector.dot(rotatedDir, unitX) * 50
+        let y = this.wiggleOffset * p5.Vector.dot(rotatedDir, unitY) * 50
+        return createVector(x, y)
+    }
+
+    drawTail(){
+        this.body.tail.draw(0,0,this.bodySize)
+    }
+
+    drawBody(outline){
+        if(outline == null) outline = 0
+        // let headSize = (this.get("headSize") * 50 + 20) + outline
+        circle(0, 0, this.bodySize + outline)
+    }
+
+    drawEyes(save){
         noStroke()
+        let headSize = (this.get("headSize") * 50 + 20)
         let eyePositioning = 0.025 * headSize * this.get("eyePositioning") * 10 + 5
-        let eyeLX = x - eyePositioning
-        let eyeRX = x + eyePositioning
-        let eyeY = y + this.get("eyeYPos") * 10 - 5
+        let eyeLX = -eyePositioning
+        let eyeRX = eyePositioning
+        let eyeY = this.get("eyeYPos") * 10 - 5
         let eyeSize = 0.001 * headSize + this.get("eyeSize") * 10 + 5
         let pupilSize = this.get("eyeSize") * 5 + 2.5
         let pupilLX = save ? eyeLX : eyeLX + this.getPupilOffset(eyeLX, 'x', pupilSize)
@@ -116,69 +142,162 @@ class Individual{
         return offset
     }
 
-    drawArms(x, y, bodySize){
+    drawArms(outline){
+        noStroke()
+        let bodySize = this.get("headSize") * 50 + 20
+        if(outline == null){
+            outline = 0
+        }
         let armCount = this.get("armCount")
         let armSpacing = this.get("armSpacing")
         for (let i = 0; i < armCount + 1; i++){
             // fill(i == 0 ? "red" : "green")
-            let newX = x - bodySize / 3
-            let newY = y + bodySize / 5
-            this.drawTransformedEllipse(x - bodySize/3, y + bodySize/10 - i * 5, PI/3 + i * armSpacing * PI/6, 7, bodySize / 1.5)
-            this.drawTransformedEllipse(x + bodySize/3, y + bodySize/10 - i * 5, PI/6 - i * armSpacing * PI/6, bodySize / 1.5, 7)
+            let x = bodySize / 3
+            let y = bodySize / 10
+            this.drawTransformedEllipse(-x, y - i * 5, PI/3 + i * armSpacing * PI/6, 7, bodySize / 1.5, outline)
+            this.drawTransformedEllipse(x, y - i * 5, PI/6 - i * armSpacing * PI/6, bodySize / 1.5, 7, outline)
         }
     }
 
-    drawTransformedEllipse(x, y, r, rx, ry){
+    drawTransformedEllipse(x, y, r, rx, ry, outline){
         translate(x, y);
         rotate(r);
-        ellipse(0, 0, rx, ry)
+        ellipse(0, 0, rx + outline, ry + outline)
         rotate(-r)
         translate(-x, -y)
     }
 
-    drawMouth(x, y, mouthType){
+    drawMouth(){
+        let mouthType = this.get("mouth")
         if(mouthType == 0){
             fill(0)
             noStroke()
-            let mouthY = y + 5
-            arc(x, mouthY, 10, 10, 0, PI)
+            let mouthY = 5
+            arc(0, mouthY, 10, 10, 0, PI)
         } else if (mouthType == 1){
             fill(0)
             noStroke()
-            let mouthY = y + 5
-            circle(x, mouthY, 5, 5)
+            let mouthY = 5
+            circle(0, mouthY, 5, 5)
         } else if (mouthType == 2){
             noFill();
             stroke(0);
+            strokeWeight(1);
             beginShape();
-            vertex(x - 4.5, y + 4.5)
-            vertex(x - 3, y + 3)
-            vertex(x - 1.5, y + 4.5)
-            vertex(x, y + 3)
-            vertex(x + 1.5, y + 4.5)
-            vertex(x + 3, y + 3)
-            vertex(x + 4.5, y + 4.5)
+            vertex(-4.5, 4.5)
+            vertex(-3, 3)
+            vertex(-1.5, 4.5)
+            vertex(0, 3)
+            vertex(1.5, 4.5)
+            vertex(3, 3)
+            vertex(4.5, 4.5)
             endShape();
         } else if (mouthType == 3){
             let headSize = this.get("headSize")
-            let multiplier = 1 + headSize * 1.1;
+            let mult = 1 + headSize * 1.1;
             let offset = 5 + 10 * headSize
             fill(this.getColor("Red"), this.getColor("Blue"), this.getColor("Green"))
             stroke(0)
+            strokeWeight(1);
             beginShape()
-            vertex(x - 2 * multiplier, y + offset + 0 * multiplier)
-            vertex(x - 2 * multiplier, y + offset + 7 * multiplier)
-            vertex(x - 4 * multiplier, y + offset + 9 * multiplier)
-            vertex(x - 4 * multiplier, y + offset + 11 * multiplier)
-            vertex(x + 4 * multiplier, y + offset + 11 * multiplier)
-            vertex(x + 4 * multiplier, y + offset + 9 * multiplier)
-            vertex(x + 2 * multiplier, y + offset + 7 * multiplier)
-            vertex(x + 2 * multiplier, y + offset + 0 * multiplier)
+            vertex(-2 * mult, offset + 0 * mult)
+            vertex(-2 * mult, offset + 7 * mult)
+            vertex(-4 * mult, offset + 9 * mult)
+            vertex(-4 * mult, offset + 11 * mult)
+            vertex(4 * mult, offset + 11 * mult)
+            vertex(4 * mult, offset + 9 * mult)
+            vertex(2 * mult, offset + 7 * mult)
+            vertex(2 * mult, offset + 0 * mult)
             endShape()
         }
+    }
+
+    drawHighlight(){
+        fill("white")
+        let outline = 5
+        this.drawBody(outline)
+        this.drawArms(outline)
     }
 
     getColor(color){
         return this.get("color"+color) * (255 - this.colorOffset) + this.colorOffset
     }
 }
+
+var tailDepth = 5
+var speed = 1
+class Body {
+    constructor(){
+        this.pos = this.randomVector()
+        this.target = this.randomVector()
+        this.speed = speed
+        this.direction = p5.Vector.sub(this.target, this.pos).normalize()
+        this.velocity = p5.Vector.mult(this.direction, this.speed)
+        this.tail = new Tail(tailDepth)
+    }
+
+    update(){
+        if(p5.Vector.sub(this.pos, this.target).magSq() < 5){
+            this.target = this.randomVector()
+            this.direction = p5.Vector.sub(this.target, this.pos).normalize()
+            this.velocity = p5.Vector.mult(this.direction, this.speed)
+        } 
+        this.pos = this.pos.add(this.velocity)
+        this.tail.update()
+    }
+
+    randomVector(){
+        let x = 10 + Math.random() * (width - 20)
+        let y = 10 + Math.random() * (height - 20)
+        return createVector(x, y)
+    }
+}
+
+var wiggleSpeed = 0.06
+var maxTailAngle = 0.05 * Math.PI
+class Tail {
+    constructor(maxLevel, level, counter){
+        if(level == null){
+            this.level = 0
+        } else {
+            this.level = level
+        }
+        this.counterIncrease = Math.PI * wiggleSpeed;
+        if(counter == null){
+            this.counter = Math.random() * 2 * Math.PI 
+        } else {
+            this.counter = counter + this.level * 0 * this.counterIncrease
+        }
+        this.maxLevel = maxLevel
+        this.angle = 0
+        this.maxAngle = maxTailAngle
+        // console.log("Created tail with level " + this.level)
+        if(this.level != maxLevel){
+            this.tail = new Tail(maxLevel, this.level+1, this.counter)
+        }
+    }
+
+    update(){
+        this.counter = (this.counter + this.counterIncrease) % (2 * Math.PI)
+        this.angle = this.maxAngle * Math.sin(this.counter) + 0.5 * Math.PI
+        if(this.tail != null) this.tail.update()
+    }
+
+    draw(x, y, bodySize){
+        let pos = p5.Vector.fromAngle(this.angle, bodySize * 0.2)
+
+        noStroke()
+
+        line(0, 0, pos.x, pos.y)
+        let size = (3 - ((this.level + 1) / (this.maxLevel+1) * 2)) * 0.2 * bodySize
+        circle(pos.x, pos.y, size)
+        if(this.tail != null){
+            push()
+            translate(pos.x, pos.y)
+            rotate(this.angle - 0.5 * Math.PI)
+            this.tail.draw(pos.x, pos.y, bodySize)
+            pop()
+        }
+    }
+}
+
