@@ -1,3 +1,4 @@
+var crazyMode = false
 class Genotype {
 
     constructor (){
@@ -10,8 +11,11 @@ class Genotype {
         this.discreteGenotypeLibrary.set("eyeType", 3)
         this.discreteGenotype = new Map()
 
-        // this.customInitialization()
-        this.randomInitialization()
+        if(crazyMode){
+            this.randomInitialization()
+        } else {
+            this.customInitialization()
+        }
         this.mutate()
     }
 

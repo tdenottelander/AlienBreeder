@@ -163,3 +163,9 @@ function saveAlien(){
     saving = !saving
 }
 
+function randomInit(){
+    crazyMode = !crazyMode
+    document.getElementById("crazymode").textContent = crazyMode ? "Crazy mode: on" : "Crazy mode: off"
+    this.ea.initPopulation()
+}
+
