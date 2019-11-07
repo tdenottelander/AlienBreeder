@@ -2,7 +2,7 @@ class Genotype {
 
     constructor (){
         this.realGenotype = new Map()
-        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing", "speed", "tailWiggleSpeed", "tailLength", "tailSegments"];
+        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing", "speed", "tailWiggleSpeed", "tailLength", "tailSegments", "numberOfTails"];
     
         this.discreteGenotypeLibrary = new Map()
         this.discreteGenotypeLibrary.set("mouth", 5)

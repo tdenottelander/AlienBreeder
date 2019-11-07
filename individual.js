@@ -92,11 +92,7 @@ class Individual{
     }
 
     drawTail(save){
-        if(save){
-            this.body.tail.drawStraight(this.bodySize, this.get("tailLength"))
-        } else {
-            this.body.tail.draw(this.bodySize, this.get("tailLength"))
-        }
+        this.body.drawTails(save, this.bodySize, this.get("tailLength"))
     }
 
     drawBody(outline){
@@ -255,6 +251,8 @@ var maxTailDepth = 10
 var maxSpeed = 1
 var minSpeed = 2
 var accelerationForce = 0.07
+var maxTailsSpreadAngle = 0.2 * Math.PI
+var maxTails = 5
 class Body {
     constructor(genotype){
         this.pos = this.randomVector()
@@ -263,7 +261,10 @@ class Body {
         this.direction = p5.Vector.sub(this.target, this.pos).normalize()
         this.velocity = p5.Vector.mult(this.direction, this.speed)
         this.acceleration = createVector(0,0)
-        this.tail = new Tail(Math.floor(maxTailDepth * genotype.get("tailSegments")), genotype.get("tailWiggleSpeed"))
+        this.tails = []
+        for(let i = 0; i < Math.floor(genotype.get("numberOfTails") * maxTails); i++){
+            this.tails.push(new Tail(Math.floor(maxTailDepth * genotype.get("tailSegments")), genotype.get("tailWiggleSpeed")))
+        }
     }
 
     update(){
@@ -275,13 +276,31 @@ class Body {
         line(this.pos.x, this.pos.y, this.pos.x + this.acceleration.x * 30, this.pos.y + this.acceleration.y * 30)
         this.velocity = p5.Vector.mult(this.direction, this.speed)
         this.pos = this.pos.add(this.velocity)
-        this.tail.update()
+        for(let tail of this.tails){
+            tail.update()
+        }
     }
 
     randomVector(){
         let x = 20 + Math.random() * (width - 40)
         let y = 20 + Math.random() * (height - 40)
         return createVector(x, y)
+    }
+
+    drawTails(save, bodysize, tailLength){
+        for(let i = 0; i < this.tails.length; i++){
+            push()
+            if(this.tails.length > 1){
+                let rotation = interpolate(-maxTailsSpreadAngle, maxTailsSpreadAngle, i / (this.tails.length-1))
+                rotate(rotation)
+            }
+            if(save){
+                this.tails[i].drawStraight(bodysize, tailLength)
+            } else {
+                this.tails[i].draw(bodysize, tailLength)
+            }
+            pop()
+        }
     }
 }
 
