@@ -1,6 +1,6 @@
 class EA {
     constructor (){
-        this.popSize = 10
+        this.popSize = 20
         this.initPopulation()
     }
 

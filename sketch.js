@@ -14,8 +14,8 @@ document.addEventListener('mousedown', function (event) {
   }, false);
 
 function setup(){
-    width = 800;
-    height = 400;
+    width = 1000;
+    height = 500;
     canvas = createCanvas(width, height);
     canvas.parent('CanvasHolder')
     slider = createSlider(0, 0.5, 0.25, 0.125)
@@ -127,10 +127,19 @@ function genotype(){
 
 function mousePressed(){
     if(mouseInBounds() && hoverID != -1){
-        ea.createNewPopulationFromIndividual(hoverID)
-        hoverID = -1
+        if(!saving){
+            ea.createNewPopulationFromIndividual(hoverID)
+            hoverID = -1
+        } else {
+            console.log("save " + hoverID)
+            clear()
+            this.ea.population[hoverID].draw(true)
+            let cropped = this.ea.population[hoverID].getCropped()
+            save(cropped, "alien.png")
+            saveAlien()
+        }
     }
-    // if(mouseInBounds()){
+    // if(mouseInBounds() && hoverID != -1){
     //     let i = int(mouseY / 100) * 6 + int(mouseX / 100)
     //     if(!saving){
     //         ea.createNewPopulationFromIndividual(i)

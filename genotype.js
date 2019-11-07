@@ -2,7 +2,7 @@ class Genotype {
 
     constructor (){
         this.realGenotype = new Map()
-        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing"];
+        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing", "speed", "tailWiggleSpeed", "tailLength", "tailSegments"];
     
         this.discreteGenotypeLibrary = new Map()
         this.discreteGenotypeLibrary.set("mouth", 5)
@@ -10,7 +10,9 @@ class Genotype {
         this.discreteGenotypeLibrary.set("eyeType", 3)
         this.discreteGenotype = new Map()
 
-        this.customInitialization()
+        // this.customInitialization()
+        this.randomInitialization()
+        this.mutate()
     }
 
     randomInitialization(){
@@ -55,7 +57,7 @@ class Genotype {
         }
 
         for (let entry of this.discreteGenotype.keys()){
-            if(Math.random() > 0.90){
+            if(Math.random() > 0.80){
                 let value = this.discreteGenotype.get(entry)
                 let newValue = value
                 while(newValue == value){
@@ -88,7 +90,6 @@ class Genotype {
     }
 
     get(property){
-        let res = 0;
         if(this.realGenotype.has(property)){
             return this.realGenotype.get(property)
         } else if (this.discreteGenotype.has(property)){

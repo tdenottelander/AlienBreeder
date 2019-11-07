@@ -3,14 +3,14 @@ class Individual{
     wiggle = false
     wiggleFactor = 0.2
     counter = 0
-    counterIncrease = Math.PI / 20;
+    counterIncrease;
     wiggleOffset = 0
     colorOffset = 50
 
     constructor(id){
         this.id = id
         this.genotype = new Genotype()
-        this.body = new Body()
+        this.refresh()
     }
 
     crossover(other){
@@ -19,12 +19,20 @@ class Individual{
 
     mutate(){
         this.genotype.mutate()
+        this.refresh()
         return this
+    }
+
+    refresh(){
+        this.body = new Body(this.genotype)
+        this.counterIncrease = Math.PI / 10 * this.genotype.get("tailWiggleSpeed")
+        this.counter = Math.random() * Math.PI * 2
     }
 
     clone(id){
         let newIndividual = new Individual(id)
         newIndividual.genotype = this.genotype.clone()
+        newIndividual.refresh()
         return newIndividual
     }
 
@@ -37,12 +45,18 @@ class Individual{
 
         let offset = this.getWiggleOffset()
         
-        translate(this.body.pos.x + offset.x, this.body.pos.y + offset.y)
-        rotate(this.body.direction.heading() + Math.PI * 0.5)
-
-        if(this.wiggle){
-            this.drawHighlight()
+        if(!save){
+            translate(this.body.pos.x + offset.x, this.body.pos.y + offset.y)
+            rotate(this.body.direction.heading() + Math.PI * 0.5)
+            if(this.wiggle){
+                this.drawHighlight()
+            }
+        } else {
+            background(0)
+            translate(200, 200)
         }
+
+
 
         this.rgb = [this.getColor("Red"), this.getColor("Blue"), this.getColor("Green")]
 
@@ -50,9 +64,8 @@ class Individual{
         fill(this.rgb)
         noStroke()
         this.bodySize = (this.get("headSize") * 50 + 20)
-        // circle(0, 0, headSize)
         this.drawBody()
-        this.drawTail()
+        this.drawTail(save)
 
         // Draw arms
         this.drawArms()
@@ -78,8 +91,12 @@ class Individual{
         return createVector(x, y)
     }
 
-    drawTail(){
-        this.body.tail.draw(0,0,this.bodySize)
+    drawTail(save){
+        if(save){
+            this.body.tail.drawStraight(this.bodySize, this.get("tailLength"))
+        } else {
+            this.body.tail.draw(this.bodySize, this.get("tailLength"))
+        }
     }
 
     drawBody(outline){
@@ -170,16 +187,18 @@ class Individual{
     drawMouth(){
         let mouthType = this.get("mouth")
         if(mouthType == 0){
+
+        } else if(mouthType == 1){
             fill(0)
             noStroke()
             let mouthY = 5
             arc(0, mouthY, 10, 10, 0, PI)
-        } else if (mouthType == 1){
+        } else if (mouthType == 2){
             fill(0)
             noStroke()
             let mouthY = 5
             circle(0, mouthY, 5, 5)
-        } else if (mouthType == 2){
+        } else if (mouthType == 3){
             noFill();
             stroke(0);
             strokeWeight(1);
@@ -192,7 +211,7 @@ class Individual{
             vertex(3, 3)
             vertex(4.5, 4.5)
             endShape();
-        } else if (mouthType == 3){
+        } else if (mouthType == 4){
             let headSize = this.get("headSize")
             let mult = 1 + headSize * 1.1;
             let offset = 5 + 10 * headSize
@@ -222,47 +241,61 @@ class Individual{
     getColor(color){
         return this.get("color"+color) * (255 - this.colorOffset) + this.colorOffset
     }
+
+    getCropped(){
+        let width = 10 + this.bodySize * 1.8
+        let tailLength = this.get("tailLength") * this.get("tailSegments") * 10
+        let height = (this.bodySize * 0.4 + tailLength * 4) * 5
+        let heightOffset = 0.5 - (tailLength * 5 / height)
+        return get(200 - 0.5 * width, 200 - heightOffset * height, width, height)
+    }
 }
 
-var tailDepth = 5
-var speed = 1
+var maxTailDepth = 10
+var maxSpeed = 1
+var minSpeed = 2
+var accelerationForce = 0.07
 class Body {
-    constructor(){
+    constructor(genotype){
         this.pos = this.randomVector()
         this.target = this.randomVector()
-        this.speed = speed
+        this.speed = interpolate(minSpeed, maxSpeed, genotype.get("speed"))
         this.direction = p5.Vector.sub(this.target, this.pos).normalize()
         this.velocity = p5.Vector.mult(this.direction, this.speed)
-        this.tail = new Tail(tailDepth)
+        this.acceleration = createVector(0,0)
+        this.tail = new Tail(Math.floor(maxTailDepth * genotype.get("tailSegments")), genotype.get("tailWiggleSpeed"))
     }
 
     update(){
-        if(p5.Vector.sub(this.pos, this.target).magSq() < 5){
+        if(p5.Vector.sub(this.pos, this.target).magSq() < 500){
             this.target = this.randomVector()
-            this.direction = p5.Vector.sub(this.target, this.pos).normalize()
-            this.velocity = p5.Vector.mult(this.direction, this.speed)
         } 
+        this.acceleration = p5.Vector.sub(this.target, this.pos).normalize().mult(accelerationForce)
+        this.direction.add(this.acceleration).normalize()
+        line(this.pos.x, this.pos.y, this.pos.x + this.acceleration.x * 30, this.pos.y + this.acceleration.y * 30)
+        this.velocity = p5.Vector.mult(this.direction, this.speed)
         this.pos = this.pos.add(this.velocity)
         this.tail.update()
     }
 
     randomVector(){
-        let x = 10 + Math.random() * (width - 20)
-        let y = 10 + Math.random() * (height - 20)
+        let x = 20 + Math.random() * (width - 40)
+        let y = 20 + Math.random() * (height - 40)
         return createVector(x, y)
     }
 }
 
-var wiggleSpeed = 0.06
+var maxWiggleSpeed = 0.08
+var minWiggleSpeed = 0.02
 var maxTailAngle = 0.05 * Math.PI
 class Tail {
-    constructor(maxLevel, level, counter){
+    constructor(maxLevel, wiggleSpeed, level, counter){
         if(level == null){
             this.level = 0
         } else {
             this.level = level
         }
-        this.counterIncrease = Math.PI * wiggleSpeed;
+        this.counterIncrease = Math.PI * interpolate(minWiggleSpeed, maxWiggleSpeed, wiggleSpeed)
         if(counter == null){
             this.counter = Math.random() * 2 * Math.PI 
         } else {
@@ -273,7 +306,7 @@ class Tail {
         this.maxAngle = maxTailAngle
         // console.log("Created tail with level " + this.level)
         if(this.level != maxLevel){
-            this.tail = new Tail(maxLevel, this.level+1, this.counter)
+            this.tail = new Tail(maxLevel, wiggleSpeed, this.level+1, this.counter)
         }
     }
 
@@ -283,21 +316,34 @@ class Tail {
         if(this.tail != null) this.tail.update()
     }
 
-    draw(x, y, bodySize){
-        let pos = p5.Vector.fromAngle(this.angle, bodySize * 0.2)
-
-        noStroke()
-
-        line(0, 0, pos.x, pos.y)
+    draw(bodySize, tailLength){
+        let pos = p5.Vector.fromAngle(this.angle, bodySize * tailLength * 0.4)
         let size = (3 - ((this.level + 1) / (this.maxLevel+1) * 2)) * 0.2 * bodySize
         circle(pos.x, pos.y, size)
         if(this.tail != null){
             push()
             translate(pos.x, pos.y)
             rotate(this.angle - 0.5 * Math.PI)
-            this.tail.draw(pos.x, pos.y, bodySize)
+            this.tail.draw(bodySize, tailLength)
             pop()
         }
     }
+
+    drawStraight(bodySize, tailLength){
+        let pos = createVector(0, bodySize * tailLength * 0.4)
+        let size = (3 - ((this.level + 1) / (this.maxLevel+1) * 2)) * 0.2 * bodySize
+        circle(pos.x, pos.y, size)
+        console.log("drawing straigth")
+        if(this.tail != null){
+            push()
+            translate(pos.x, pos.y)
+            this.tail.drawStraight(bodySize, tailLength)
+            pop()
+        }
+    }
+}
+
+function interpolate(min, max, value){
+    return min + value * (max - min)
 }
 
