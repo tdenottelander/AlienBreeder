@@ -139,6 +139,27 @@ class Individual{
             fill(0)
             circle(eyeLX, eyeY, eyeSize * 1.2)
             circle(eyeRX, eyeY, eyeSize * 1.2)
+        } else if (eyeType == 3) {
+            fill(255)
+            circle(0, eyeY * 3, eyeSize * 1.5)
+            fill(0)
+            circle(0, eyeY * 3, pupilSize * 1.5)
+        } else if (eyeType == 4){
+            let newEyeY = eyeY - 30
+            fill(this.rgb)
+            circle(eyeLX, newEyeY, eyeSize * 1.4)
+            circle(eyeRX, newEyeY, eyeSize * 1.4)
+            stroke(this.rgb)
+            strokeWeight(5)
+            line(0,0,eyeLX, newEyeY)
+            line(0,0,eyeRX, newEyeY)
+            noStroke()
+            fill(255)
+            circle(eyeLX, newEyeY, eyeSize)
+            circle(eyeRX, newEyeY, eyeSize)
+            fill(0)
+            circle(eyeLX, newEyeY, pupilSize)
+            circle(eyeRX, newEyeY, pupilSize)
         }
         
     }

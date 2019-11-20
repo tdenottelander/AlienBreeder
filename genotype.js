@@ -8,7 +8,7 @@ class Genotype {
         this.discreteGenotypeLibrary = new Map()
         this.discreteGenotypeLibrary.set("mouth", 5)
         this.discreteGenotypeLibrary.set("armCount", 3)
-        this.discreteGenotypeLibrary.set("eyeType", 3)
+        this.discreteGenotypeLibrary.set("eyeType", 5)
         this.discreteGenotype = new Map()
 
         if(crazyMode){
