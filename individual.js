@@ -60,6 +60,9 @@ class Individual{
 
         this.rgb = [this.getColor("Red"), this.getColor("Blue"), this.getColor("Green")]
 
+        // Draw horns
+        this.drawHorns()
+
         // Draw body
         fill(this.rgb)
         noStroke()
@@ -176,6 +179,47 @@ class Individual{
         return offset
     }
 
+    drawHorns(){
+        let hornType = this.get("hornType")
+        let size = this.get("headSize")
+        if(hornType == 0){
+            function drawHorn(direction){
+                beginShape()
+                //Clockwise shape (as seen from perspective of left horn)
+                vertex(direction * (5 + size * 10), -(10 + size * 20)) //First vertex head
+                vertex(direction * (5 + size * 20), -(10 + size * 5)) //Second vertex head
+                vertex(direction * (5 + size * 35), -(10 + size * 35)) //First vertex top
+                vertex(direction * (5 + size * 30), -(10 + size * 40)) //Second vertex top
+                endShape()
+            }
+            fill(this.rgb)
+            drawHorn(1)
+            drawHorn(-1)
+        } else if (hornType == 1){
+            //No horns
+        } else if (hornType == 2){
+            //Bubble
+            fill(this.rgb)
+            circle(0, -size * 30, 20 + size * 20)
+        } else if (hornType == 3){
+            //Arrowhead
+            let length = 10 + size * 30
+            // let length = 30
+            fill(this.rgb)
+            beginShape()
+            vertex(-10, 0)
+            vertex(-10, -length)
+            vertex(-16, -length)
+            vertex(-18, -(length + 4))
+            vertex(0, -(length + 10))
+            vertex(18, -(length + 4))
+            vertex(16, -length)
+            vertex(10, -length)
+            vertex(10, 0)
+            endShape()
+        }
+    }
+
     drawArms(outline){
         noStroke()
         let bodySize = this.get("headSize") * 50 + 20
@@ -272,7 +316,8 @@ var maxTailDepth = 10
 var maxSpeed = 2
 var minSpeed = 0.5
 var accelerationForce = 0.07
-var maxTailsSpreadAngle = 0.2 * Math.PI
+var minTailsSpreadAngle = 0.01 * Math.PI
+var maxTailsSpreadAngle = 0.6 * Math.PI
 var maxTails = 5
 class Body {
     constructor(genotype){
@@ -283,8 +328,15 @@ class Body {
         this.velocity = p5.Vector.mult(this.direction, this.speed)
         this.acceleration = createVector(0,0)
         this.tails = []
-        for(let i = 0; i < Math.floor(genotype.get("numberOfTails") * maxTails); i++){
-            this.tails.push(new Tail(Math.floor(maxTailDepth * genotype.get("tailSegments")), genotype.get("tailWiggleSpeed")))
+        let spreadAngle = interpolate(minTailsSpreadAngle, maxTailsSpreadAngle, genotype.get("tailAngle"))
+        let tailsAmount = Math.floor(genotype.get("numberOfTails") * maxTails)
+        for(let i = 0; i < tailsAmount; i++){
+            let tail = new Tail(
+                Math.floor(maxTailDepth * genotype.get("tailSegments")), 
+                genotype
+            )
+            tail.rotation = interpolate(-spreadAngle, spreadAngle, i / (tailsAmount-1))
+            this.tails.push(tail)
         }
     }
 
@@ -312,8 +364,7 @@ class Body {
         for(let i = 0; i < this.tails.length; i++){
             push()
             if(this.tails.length > 1){
-                let rotation = interpolate(-maxTailsSpreadAngle, maxTailsSpreadAngle, i / (this.tails.length-1))
-                rotate(rotation)
+                rotate(this.tails[i].rotation)
             }
             if(save){
                 this.tails[i].drawStraight(bodysize, tailLength)
@@ -329,24 +380,35 @@ var maxWiggleSpeed = 0.08
 var minWiggleSpeed = 0.02
 var maxTailAngle = 0.05 * Math.PI
 class Tail {
-    constructor(maxLevel, wiggleSpeed, level, counter){
+    constructor(maxLevel, genotype, level, counter){
         if(level == null){
             this.level = 0
         } else {
             this.level = level
         }
-        this.counterIncrease = Math.PI * interpolate(minWiggleSpeed, maxWiggleSpeed, wiggleSpeed)
+        this.rotation;
+        this.counterIncrease = Math.PI * interpolate(minWiggleSpeed, maxWiggleSpeed, genotype.get("tailWiggleSpeed"))
         if(counter == null){
-            this.counter = Math.random() * 2 * Math.PI 
+            let tailWiggleStyle = genotype.get("tailWiggleStyle1")
+            if(tailWiggleStyle == 0){
+                this.counter = 0
+            } else if(tailWiggleStyle == 1) {
+                this.counter = Math.random() * 2 * Math.PI 
+            } 
         } else {
-            this.counter = counter + this.level * 0 * this.counterIncrease
+            let tailWiggleStyle2 = genotype.get("tailWiggleStyle2")
+            if(tailWiggleStyle2 == 0){
+                this.counter = counter
+            } else if (tailWiggleStyle2 == 1){
+                this.counter = counter + this.level * 10 * this.counterIncrease
+            }
         }
         this.maxLevel = maxLevel
         this.angle = 0
         this.maxAngle = maxTailAngle
         // console.log("Created tail with level " + this.level)
         if(this.level != maxLevel){
-            this.tail = new Tail(maxLevel, wiggleSpeed, this.level+1, this.counter)
+            this.tail = new Tail(maxLevel, genotype, this.level+1, this.counter)
         }
     }
 

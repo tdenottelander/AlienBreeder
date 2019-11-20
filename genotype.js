@@ -1,14 +1,17 @@
-var crazyMode = false
+var crazyMode = true
 class Genotype {
 
     constructor (){
         this.realGenotype = new Map()
-        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing", "speed", "tailWiggleSpeed", "tailLength", "tailSegments", "numberOfTails"];
+        this.properties = ["headSize", "colorRed", "colorBlue", "colorGreen", "eyeSize", "eyeYPos", "eyePositioning", "armSpacing", "speed", "tailWiggleSpeed", "tailLength", "tailSegments", "numberOfTails", "tailAngle"];
     
         this.discreteGenotypeLibrary = new Map()
         this.discreteGenotypeLibrary.set("mouth", 5)
         this.discreteGenotypeLibrary.set("armCount", 3)
         this.discreteGenotypeLibrary.set("eyeType", 5)
+        this.discreteGenotypeLibrary.set("tailWiggleStyle1", 2)
+        this.discreteGenotypeLibrary.set("tailWiggleStyle2", 2)
+        this.discreteGenotypeLibrary.set("hornType", 4)
         this.discreteGenotype = new Map()
 
         if(crazyMode){
