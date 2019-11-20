@@ -269,8 +269,8 @@ class Individual{
 }
 
 var maxTailDepth = 10
-var maxSpeed = 1
-var minSpeed = 2
+var maxSpeed = 2
+var minSpeed = 0.5
 var accelerationForce = 0.07
 var maxTailsSpreadAngle = 0.2 * Math.PI
 var maxTails = 5
